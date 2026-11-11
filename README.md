@@ -1,45 +1,71 @@
-# Umbra
+# Umbra frontend
 
-Umbra is a private social trading prototype for the NEAR Hackathon: traders keep positions encrypted, publish a public PnL record, and sell time-limited viewing keys to followers.
+The frontend reads trader profiles, terms, public PnL snapshots, and subscription
+state from the UmbraRegistry deployed on **NEAR testnet**. Wallet connection and
+payable registry calls use NEAR Wallet Selector. There is no demo-data fallback:
+if the registry is not configured or has no records, the app reports that state
+instead of filling the interface with example traders.
 
-> Trade in the dark. Be followed in the light.
+The contract stores registry and money state only. It does not store trade data,
+plaintext keys, or private keys. Off-chain trade feeds and key-envelope storage
+are separate systems and are not provided by this frontend.
 
-## Judge flow
+## Configure the deployed contract
 
-1. Open the landing page and select **Connect wallet**. The demo wallet is local-only and moves no funds.
-2. Open **Explore**, choose a trader, and select **Subscribe**. The locked feed animates into an unlocked feed.
-3. Open **Following** to see the active key, expiry, and copy-trade controls.
-4. Open **Studio**, publish a trade, and see the private trade appear in the encrypted publish list.
-5. Open **How it works** for the privacy model and explicit limits.
+The value printed as `SHA-256 checksum bs58` after building the Wasm is the code
+checksum, **not** the deployed contract account ID. Use the actual NEAR testnet
+account ID to which you deployed the contract.
 
-## Architecture
+```bash
+cp .env.example .env
+```
 
-- Vite, React, TypeScript, Tailwind CSS, React Router, Recharts, Framer Motion, Lucide.
-- Browser crypto uses `tweetnacl`: secretbox encrypts trades, and box envelopes model follower access.
-- Supabase stores profiles, trader settings, ciphertext trades, envelopes, subscriptions, and public PnL snapshots.
-- The current UI uses a local demo session so the first run works without a wallet extension. `src/lib/supabase.ts` enables persistence when public Supabase variables are available.
-- NEAR wallet selector and NEAR Intents integration are represented by adapter-ready demo behavior; no real wallet transaction or fund movement occurs.
+Set this value in `.env`:
 
-## Privacy model and limits
+```dotenv
+VITE_REGISTRY_ACCOUNT_ID=johnbosco-dev.testnet
+```
 
-Plaintext trade payloads are encrypted before storage. Public data includes handles, pricing, follower count, timing metadata, and self-reported PnL. A follower with access can copy or share decrypted trades, and public timing can reveal activity patterns. Demo-mode RLS intentionally allows anonymous writes so judges can exercise the flow; a live deployment should exchange a NEP-413 signature for a Supabase session and narrow write policies to the signed trader.
+The generated contract ABI is checked in at
+[`public/umbra_registry_abi.json`](public/umbra_registry_abi.json). View and
+change methods are checked against that ABI before the frontend calls them.
+Wallet Selector and the registry RPC are configured for testnet only.
 
-## Mock vs live
+The registry is initialized. Its current testnet configuration uses
+`johnbosco-dev.testnet` as owner, `johnbosco.testnet` as attestor, a 500 bps
+protocol fee, and is not paused. Initialization is one-time; this frontend does
+not expose an initialization action.
 
-Mocked: wallet connection, subscription payment, Intents quotes and fills, PnL verification, demo seed data, and copy-trade execution. To wire live: finish NEP-413 auth exchange, use the NEAR wallet selector modal, proxy dry-run Intents quotes through an Edge Function, add the provided registry ABI and address, and replace demo RLS writes with ownership checks. Demo mode never displays a fake mainnet transaction hash.
+The wallet modal includes Intear Wallet and MyNearWallet. Both sign
+transactions on NEAR testnet; switch the wallet to testnet and keep testnet
+NEAR available for gas and payable calls.
 
-## Libraries
+## Run and validate
 
-React, React Router, Tailwind CSS, Recharts, Framer Motion, Lucide React, tweetnacl, Supabase JS, and Vitest.
+```bash
+npm ci
+npm run dev
+```
 
-## Run locally
+The Studio page registers the connected wallet as a trader. Registration
+requires an X25519 public key (base64-encoded 32 bytes) and an exact `0.02 NEAR`
+storage deposit. A subscriber pays the trader's exact current price through a
+wallet-confirmed `subscribe` transaction.
 
-Install dependencies with `npm install`, copy `.env.example` to `.env`, and use the Vite development workflow. The app defaults to demo mode and does not require a wallet extension.
+```bash
+npm run typecheck
+npm run lint
+npm test
+npm run build
+```
 
-## Environment variables
+## Current scope
 
-`VITE_MODE=demo|live`, public Supabase URL and anon key, and `VITE_REGISTRY_ADDRESS` for a future Aurora registry deployment. Never commit secrets.
-
-## Deployment
-
-Netlify is configured with `netlify.toml` for a single-page app redirect and the production build command. Use demo mode for the hackathon presentation until live adapters and NEP-413 auth are connected.
+- Explore and profile pages load live trader state and up to 90 PnL snapshots
+  for each listed trader.
+- Following checks the connected account's live subscription state.
+- Studio supports on-chain trader registration.
+- This frontend does not execute copy trades, publish encrypted trade feeds,
+  create key envelopes, or submit PnL attestations. Those require separate
+  off-chain systems or a configured attestor.
+- Testnet funds and PnL attestations are not production assurances.

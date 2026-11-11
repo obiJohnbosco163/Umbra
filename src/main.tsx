@@ -1,10 +1,15 @@
+import './buffer-polyfill';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.tsx';
+import { RegistryProvider } from '@/near/RegistryProvider';
 import './index.css';
+import '@near-wallet-selector/modal-ui/styles.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <RegistryProvider>
+      <App />
+    </RegistryProvider>
   </StrictMode>
 );

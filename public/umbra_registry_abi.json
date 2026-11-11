@@ -1,0 +1,822 @@
+{
+  "schema_version": "0.4.0",
+  "metadata": {
+    "name": "umbra-registry",
+    "version": "0.1.0",
+    "build": {
+      "compiler": "rustc 1.99.1",
+      "builder": "cargo-near cargo-near-build 0.11.5"
+    },
+    "wasm_hash": "Ba2JJafTrrzcyeRsP7GG225tmxAMvw5ndShhE9aSuhq9"
+  },
+  "body": {
+    "functions": [
+      {
+        "name": "contract_source_metadata",
+        "kind": "view"
+      },
+      {
+        "name": "get_config",
+        "doc": " Returns public configuration and accumulated protocol earnings.",
+        "kind": "view",
+        "result": {
+          "serialization_type": "json",
+          "type_schema": {
+            "$ref": "#/definitions/ConfigView"
+          }
+        }
+      },
+      {
+        "name": "get_envelope_pointer",
+        "doc": " Returns a public envelope pointer for a specific key epoch, if present.",
+        "kind": "view",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "trader_id",
+              "type_schema": {
+                "description": "NEAR Account Identifier.\n\nThis is a unique, syntactically valid, human-readable account identifier on the NEAR network.\n\n[See the crate-level docs for information about validation.](index.html#account-id-rules)\n\nAlso see [Error kind precedence](AccountId#error-kind-precedence).\n\n## Examples\n\n``` use near_account_id::AccountId;\n\nlet alice: AccountId = \"alice.near\".parse().unwrap();\n\nassert!(\"ƒelicia.near\".parse::<AccountId>().is_err()); // (ƒ is not f) ```",
+                "type": "string"
+              }
+            },
+            {
+              "name": "follower_id",
+              "type_schema": {
+                "description": "NEAR Account Identifier.\n\nThis is a unique, syntactically valid, human-readable account identifier on the NEAR network.\n\n[See the crate-level docs for information about validation.](index.html#account-id-rules)\n\nAlso see [Error kind precedence](AccountId#error-kind-precedence).\n\n## Examples\n\n``` use near_account_id::AccountId;\n\nlet alice: AccountId = \"alice.near\".parse().unwrap();\n\nassert!(\"ƒelicia.near\".parse::<AccountId>().is_err()); // (ƒ is not f) ```",
+                "type": "string"
+              }
+            },
+            {
+              "name": "epoch",
+              "type_schema": {
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0.0
+              }
+            }
+          ]
+        },
+        "result": {
+          "serialization_type": "json",
+          "type_schema": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      {
+        "name": "get_pending_earnings",
+        "doc": " Returns an account's unwithdrawn trader earnings in yoctoNEAR.",
+        "kind": "view",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "account_id",
+              "type_schema": {
+                "description": "NEAR Account Identifier.\n\nThis is a unique, syntactically valid, human-readable account identifier on the NEAR network.\n\n[See the crate-level docs for information about validation.](index.html#account-id-rules)\n\nAlso see [Error kind precedence](AccountId#error-kind-precedence).\n\n## Examples\n\n``` use near_account_id::AccountId;\n\nlet alice: AccountId = \"alice.near\".parse().unwrap();\n\nassert!(\"ƒelicia.near\".parse::<AccountId>().is_err()); // (ƒ is not f) ```",
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "result": {
+          "serialization_type": "json",
+          "type_schema": {
+            "$ref": "#/definitions/U128"
+          }
+        }
+      },
+      {
+        "name": "get_pnl_snapshots",
+        "doc": " Returns up to 90 of a trader's most recent PnL snapshots in chronological order.",
+        "kind": "view",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "trader_id",
+              "type_schema": {
+                "description": "NEAR Account Identifier.\n\nThis is a unique, syntactically valid, human-readable account identifier on the NEAR network.\n\n[See the crate-level docs for information about validation.](index.html#account-id-rules)\n\nAlso see [Error kind precedence](AccountId#error-kind-precedence).\n\n## Examples\n\n``` use near_account_id::AccountId;\n\nlet alice: AccountId = \"alice.near\".parse().unwrap();\n\nassert!(\"ƒelicia.near\".parse::<AccountId>().is_err()); // (ƒ is not f) ```",
+                "type": "string"
+              }
+            },
+            {
+              "name": "limit",
+              "type_schema": {
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0.0
+              }
+            }
+          ]
+        },
+        "result": {
+          "serialization_type": "json",
+          "type_schema": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/PnlSnapshotView"
+            }
+          }
+        }
+      },
+      {
+        "name": "get_subscription",
+        "doc": " Returns one subscription record, if the pair has subscribed before.",
+        "kind": "view",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "trader_id",
+              "type_schema": {
+                "description": "NEAR Account Identifier.\n\nThis is a unique, syntactically valid, human-readable account identifier on the NEAR network.\n\n[See the crate-level docs for information about validation.](index.html#account-id-rules)\n\nAlso see [Error kind precedence](AccountId#error-kind-precedence).\n\n## Examples\n\n``` use near_account_id::AccountId;\n\nlet alice: AccountId = \"alice.near\".parse().unwrap();\n\nassert!(\"ƒelicia.near\".parse::<AccountId>().is_err()); // (ƒ is not f) ```",
+                "type": "string"
+              }
+            },
+            {
+              "name": "follower_id",
+              "type_schema": {
+                "description": "NEAR Account Identifier.\n\nThis is a unique, syntactically valid, human-readable account identifier on the NEAR network.\n\n[See the crate-level docs for information about validation.](index.html#account-id-rules)\n\nAlso see [Error kind precedence](AccountId#error-kind-precedence).\n\n## Examples\n\n``` use near_account_id::AccountId;\n\nlet alice: AccountId = \"alice.near\".parse().unwrap();\n\nassert!(\"ƒelicia.near\".parse::<AccountId>().is_err()); // (ƒ is not f) ```",
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "result": {
+          "serialization_type": "json",
+          "type_schema": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/SubscriptionView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "get_trader",
+        "doc": " Returns the trader registered to an account, if any.",
+        "kind": "view",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "account_id",
+              "type_schema": {
+                "description": "NEAR Account Identifier.\n\nThis is a unique, syntactically valid, human-readable account identifier on the NEAR network.\n\n[See the crate-level docs for information about validation.](index.html#account-id-rules)\n\nAlso see [Error kind precedence](AccountId#error-kind-precedence).\n\n## Examples\n\n``` use near_account_id::AccountId;\n\nlet alice: AccountId = \"alice.near\".parse().unwrap();\n\nassert!(\"ƒelicia.near\".parse::<AccountId>().is_err()); // (ƒ is not f) ```",
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "result": {
+          "serialization_type": "json",
+          "type_schema": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/TraderView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "get_trader_by_handle",
+        "doc": " Returns the trader registered to a public handle, if any.",
+        "kind": "view",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "handle",
+              "type_schema": {
+                "type": "string"
+              }
+            }
+          ]
+        },
+        "result": {
+          "serialization_type": "json",
+          "type_schema": {
+            "anyOf": [
+              {
+                "$ref": "#/definitions/TraderView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "name": "get_traders",
+        "doc": " Returns a page of traders in storage iteration order.",
+        "kind": "view",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "from_index",
+              "type_schema": {
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0.0
+              }
+            },
+            {
+              "name": "limit",
+              "type_schema": {
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0.0
+              }
+            }
+          ]
+        },
+        "result": {
+          "serialization_type": "json",
+          "type_schema": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/TraderView"
+            }
+          }
+        }
+      },
+      {
+        "name": "grant_access",
+        "doc": " Stores the caller's encrypted key-envelope pointer for an active subscriber.",
+        "kind": "call",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "follower",
+              "type_schema": {
+                "description": "NEAR Account Identifier.\n\nThis is a unique, syntactically valid, human-readable account identifier on the NEAR network.\n\n[See the crate-level docs for information about validation.](index.html#account-id-rules)\n\nAlso see [Error kind precedence](AccountId#error-kind-precedence).\n\n## Examples\n\n``` use near_account_id::AccountId;\n\nlet alice: AccountId = \"alice.near\".parse().unwrap();\n\nassert!(\"ƒelicia.near\".parse::<AccountId>().is_err()); // (ƒ is not f) ```",
+                "type": "string"
+              }
+            },
+            {
+              "name": "envelope_pointer",
+              "type_schema": {
+                "type": "string"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "new",
+        "doc": " Initializes the registry with an owner, PnL attestor, and protocol fee.",
+        "kind": "call",
+        "modifiers": [
+          "init"
+        ],
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "owner_id",
+              "type_schema": {
+                "description": "NEAR Account Identifier.\n\nThis is a unique, syntactically valid, human-readable account identifier on the NEAR network.\n\n[See the crate-level docs for information about validation.](index.html#account-id-rules)\n\nAlso see [Error kind precedence](AccountId#error-kind-precedence).\n\n## Examples\n\n``` use near_account_id::AccountId;\n\nlet alice: AccountId = \"alice.near\".parse().unwrap();\n\nassert!(\"ƒelicia.near\".parse::<AccountId>().is_err()); // (ƒ is not f) ```",
+                "type": "string"
+              }
+            },
+            {
+              "name": "attestor_id",
+              "type_schema": {
+                "description": "NEAR Account Identifier.\n\nThis is a unique, syntactically valid, human-readable account identifier on the NEAR network.\n\n[See the crate-level docs for information about validation.](index.html#account-id-rules)\n\nAlso see [Error kind precedence](AccountId#error-kind-precedence).\n\n## Examples\n\n``` use near_account_id::AccountId;\n\nlet alice: AccountId = \"alice.near\".parse().unwrap();\n\nassert!(\"ƒelicia.near\".parse::<AccountId>().is_err()); // (ƒ is not f) ```",
+                "type": "string"
+              }
+            },
+            {
+              "name": "protocol_fee_bps",
+              "type_schema": {
+                "type": "integer",
+                "format": "uint16",
+                "minimum": 0.0
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "register_trader",
+        "doc": " Registers the caller as a trader for an exact 0.02 NEAR storage deposit.",
+        "kind": "call",
+        "modifiers": [
+          "payable"
+        ],
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "handle",
+              "type_schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "enc_pub_key",
+              "type_schema": {
+                "type": "string"
+              }
+            },
+            {
+              "name": "price_per_period",
+              "type_schema": {
+                "$ref": "#/definitions/U128"
+              }
+            },
+            {
+              "name": "period_seconds",
+              "type_schema": {
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0.0
+              }
+            },
+            {
+              "name": "max_followers",
+              "type_schema": {
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0.0
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "resolve_withdrawal",
+        "doc": " Restores withdrawn accounting if the asynchronous NEAR transfer fails.",
+        "kind": "call",
+        "modifiers": [
+          "private"
+        ],
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "account_id",
+              "type_schema": {
+                "description": "NEAR Account Identifier.\n\nThis is a unique, syntactically valid, human-readable account identifier on the NEAR network.\n\n[See the crate-level docs for information about validation.](index.html#account-id-rules)\n\nAlso see [Error kind precedence](AccountId#error-kind-precedence).\n\n## Examples\n\n``` use near_account_id::AccountId;\n\nlet alice: AccountId = \"alice.near\".parse().unwrap();\n\nassert!(\"ƒelicia.near\".parse::<AccountId>().is_err()); // (ƒ is not f) ```",
+                "type": "string"
+              }
+            },
+            {
+              "name": "amount",
+              "type_schema": {
+                "$ref": "#/definitions/U128"
+              }
+            },
+            {
+              "name": "protocol_withdrawal",
+              "type_schema": {
+                "type": "boolean"
+              }
+            }
+          ]
+        },
+        "result": {
+          "serialization_type": "json",
+          "type_schema": {
+            "type": "boolean"
+          }
+        }
+      },
+      {
+        "name": "revoke_follower",
+        "doc": " Revokes a follower without deleting previously published epoch pointers.",
+        "kind": "call",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "follower",
+              "type_schema": {
+                "description": "NEAR Account Identifier.\n\nThis is a unique, syntactically valid, human-readable account identifier on the NEAR network.\n\n[See the crate-level docs for information about validation.](index.html#account-id-rules)\n\nAlso see [Error kind precedence](AccountId#error-kind-precedence).\n\n## Examples\n\n``` use near_account_id::AccountId;\n\nlet alice: AccountId = \"alice.near\".parse().unwrap();\n\nassert!(\"ƒelicia.near\".parse::<AccountId>().is_err()); // (ƒ is not f) ```",
+                "type": "string"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "rotate_key",
+        "doc": " Rotates the caller's encryption key and advances to the next key epoch.",
+        "kind": "call",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "new_enc_pub_key",
+              "type_schema": {
+                "type": "string"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "set_active",
+        "doc": " Enables or disables the caller's acceptance of new subscriptions.",
+        "kind": "call",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "active",
+              "type_schema": {
+                "type": "boolean"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "set_paused",
+        "doc": " Pauses or resumes new trader registrations and subscription purchases.",
+        "kind": "call",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "paused",
+              "type_schema": {
+                "type": "boolean"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "submit_pnl_snapshot",
+        "doc": " Submits a public PnL snapshot using the configured attestor account.",
+        "kind": "call",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "trader_id",
+              "type_schema": {
+                "description": "NEAR Account Identifier.\n\nThis is a unique, syntactically valid, human-readable account identifier on the NEAR network.\n\n[See the crate-level docs for information about validation.](index.html#account-id-rules)\n\nAlso see [Error kind precedence](AccountId#error-kind-precedence).\n\n## Examples\n\n``` use near_account_id::AccountId;\n\nlet alice: AccountId = \"alice.near\".parse().unwrap();\n\nassert!(\"ƒelicia.near\".parse::<AccountId>().is_err()); // (ƒ is not f) ```",
+                "type": "string"
+              }
+            },
+            {
+              "name": "return_bps",
+              "type_schema": {
+                "type": "integer",
+                "format": "int32"
+              }
+            },
+            {
+              "name": "win_rate_bps",
+              "type_schema": {
+                "type": "integer",
+                "format": "uint16",
+                "minimum": 0.0
+              }
+            },
+            {
+              "name": "trades_count",
+              "type_schema": {
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0.0
+              }
+            },
+            {
+              "name": "max_drawdown_bps",
+              "type_schema": {
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0.0
+              }
+            },
+            {
+              "name": "window_days",
+              "type_schema": {
+                "type": "integer",
+                "format": "uint16",
+                "minimum": 0.0
+              }
+            },
+            {
+              "name": "data_hash",
+              "type_schema": {
+                "type": "string"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "subscribe",
+        "doc": " Purchases or extends a subscription by paying its exact current price.",
+        "kind": "call",
+        "modifiers": [
+          "payable"
+        ],
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "trader_id",
+              "type_schema": {
+                "description": "NEAR Account Identifier.\n\nThis is a unique, syntactically valid, human-readable account identifier on the NEAR network.\n\n[See the crate-level docs for information about validation.](index.html#account-id-rules)\n\nAlso see [Error kind precedence](AccountId#error-kind-precedence).\n\n## Examples\n\n``` use near_account_id::AccountId;\n\nlet alice: AccountId = \"alice.near\".parse().unwrap();\n\nassert!(\"ƒelicia.near\".parse::<AccountId>().is_err()); // (ƒ is not f) ```",
+                "type": "string"
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "update_terms",
+        "doc": " Updates the caller's terms for future subscription purchases.",
+        "kind": "call",
+        "params": {
+          "serialization_type": "json",
+          "args": [
+            {
+              "name": "price_per_period",
+              "type_schema": {
+                "$ref": "#/definitions/U128"
+              }
+            },
+            {
+              "name": "period_seconds",
+              "type_schema": {
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0.0
+              }
+            },
+            {
+              "name": "max_followers",
+              "type_schema": {
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0.0
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "withdraw_earnings",
+        "doc": " Withdraws the caller's accumulated subscription earnings.",
+        "kind": "call",
+        "result": {
+          "serialization_type": "json",
+          "type_schema": {
+            "$ref": "#/definitions/Promise"
+          }
+        }
+      },
+      {
+        "name": "withdraw_protocol_earnings",
+        "doc": " Withdraws accumulated protocol earnings to the registry owner.",
+        "kind": "call",
+        "result": {
+          "serialization_type": "json",
+          "type_schema": {
+            "$ref": "#/definitions/Promise"
+          }
+        }
+      }
+    ],
+    "root_schema": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "String",
+      "type": "string",
+      "definitions": {
+        "ConfigView": {
+          "description": "JSON representation of public contract configuration.",
+          "type": "object",
+          "required": [
+            "attestor_id",
+            "owner_id",
+            "paused",
+            "protocol_earnings",
+            "protocol_fee_bps"
+          ],
+          "properties": {
+            "attestor_id": {
+              "description": "Account allowed to attest PnL snapshots.",
+              "type": "string"
+            },
+            "owner_id": {
+              "description": "Account allowed to administer the registry.",
+              "type": "string"
+            },
+            "paused": {
+              "description": "Whether new registrations and subscriptions are paused.",
+              "type": "boolean"
+            },
+            "protocol_earnings": {
+              "description": "Accumulated protocol earnings in yoctoNEAR.",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/U128"
+                }
+              ]
+            },
+            "protocol_fee_bps": {
+              "description": "Protocol fee in basis points.",
+              "type": "integer",
+              "format": "uint16",
+              "minimum": 0.0
+            }
+          }
+        },
+        "PnlSnapshotView": {
+          "description": "JSON representation of an attested public PnL snapshot.",
+          "type": "object",
+          "required": [
+            "data_hash",
+            "max_drawdown_bps",
+            "return_bps",
+            "timestamp",
+            "trades_count",
+            "win_rate_bps",
+            "window_days"
+          ],
+          "properties": {
+            "data_hash": {
+              "description": "Public hash or pointer to the off-chain attestation data.",
+              "type": "string"
+            },
+            "max_drawdown_bps": {
+              "description": "Maximum drawdown in basis points.",
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            },
+            "return_bps": {
+              "description": "Return in basis points.",
+              "type": "integer",
+              "format": "int32"
+            },
+            "timestamp": {
+              "description": "Attestation timestamp in nanoseconds.",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/U64"
+                }
+              ]
+            },
+            "trades_count": {
+              "description": "Number of trades in the reporting window.",
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            },
+            "win_rate_bps": {
+              "description": "Win rate in basis points.",
+              "type": "integer",
+              "format": "uint16",
+              "minimum": 0.0
+            },
+            "window_days": {
+              "description": "Reporting-window length in days.",
+              "type": "integer",
+              "format": "uint16",
+              "minimum": 0.0
+            }
+          }
+        },
+        "Promise": true,
+        "SubscriptionView": {
+          "description": "JSON representation of a follower's subscription.",
+          "type": "object",
+          "required": [
+            "epoch_granted",
+            "expires_at",
+            "revoked"
+          ],
+          "properties": {
+            "epoch_granted": {
+              "description": "Most recent key epoch granted to this follower.",
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            },
+            "expires_at": {
+              "description": "Subscription expiration timestamp in nanoseconds.",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/U64"
+                }
+              ]
+            },
+            "revoked": {
+              "description": "Whether the trader revoked the subscription.",
+              "type": "boolean"
+            }
+          }
+        },
+        "TraderView": {
+          "description": "JSON representation of a registered trader.",
+          "type": "object",
+          "required": [
+            "account_id",
+            "active",
+            "active_followers",
+            "current_epoch",
+            "enc_pub_key",
+            "handle",
+            "max_followers",
+            "period_seconds",
+            "price_per_period",
+            "registered_at"
+          ],
+          "properties": {
+            "account_id": {
+              "description": "Registered trader's account.",
+              "type": "string"
+            },
+            "active": {
+              "description": "Whether the trader accepts new subscriptions.",
+              "type": "boolean"
+            },
+            "active_followers": {
+              "description": "Number of followers currently counted as active.",
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            },
+            "current_epoch": {
+              "description": "Current encryption-key epoch.",
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            },
+            "enc_pub_key": {
+              "description": "Base64-encoded 32-byte X25519 public key.",
+              "type": "string"
+            },
+            "handle": {
+              "description": "Unique lowercase public handle.",
+              "type": "string"
+            },
+            "max_followers": {
+              "description": "Maximum number of concurrently subscribed followers.",
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            },
+            "period_seconds": {
+              "description": "Subscription duration in seconds.",
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            },
+            "price_per_period": {
+              "description": "Subscription price in yoctoNEAR.",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/U128"
+                }
+              ]
+            },
+            "registered_at": {
+              "description": "Registration timestamp in nanoseconds.",
+              "allOf": [
+                {
+                  "$ref": "#/definitions/U64"
+                }
+              ]
+            }
+          }
+        },
+        "U128": {
+          "description": "JSON decimal-string wrapper for unsigned 128-bit amounts.",
+          "type": "integer",
+          "format": "uint128",
+          "minimum": 0.0
+        },
+        "U64": {
+          "description": "JSON decimal-string wrapper for unsigned 64-bit timestamps.",
+          "type": "integer",
+          "format": "uint64",
+          "minimum": 0.0
+        }
+      }
+    }
+  }
+}
