@@ -1,0 +1,32 @@
+[package]
+name = "umbra-registry"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+description = "Testnet-only on-chain registry for the Umbra private social trading marketplace"
+license = "MIT"
+
+[lib]
+name = "umbra_registry"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+base64 = "0.22.1"
+borsh = "1.8.1"
+near-sdk = "=5.30.1"
+schemars = "0.8.22"
+
+[dev-dependencies]
+near-sdk = { version = "=5.30.1", features = ["unit-testing"] }
+
+[profile.release]
+codegen-units = 1
+opt-level = "z"
+lto = true
+debug = false
+panic = "abort"
+overflow-checks = true
+
+[lints.rust.unexpected_cfgs]
+level = "warn"
+check-cfg = ['cfg(near)']
