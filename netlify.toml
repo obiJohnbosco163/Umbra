@@ -2,6 +2,9 @@
   command = "npm run build"
   publish = "dist"
 
+[build.environment]
+  VITE_REGISTRY_ACCOUNT_ID = "johnbosco-dev.testnet"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
