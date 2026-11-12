@@ -8,9 +8,15 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+      // Use the browser-compatible npm package instead of the Node built-in
+      buffer: 'buffer/',
     },
+  },
+  define: {
+    global: 'globalThis',
   },
   optimizeDeps: {
     exclude: ['lucide-react'],
+    include: ['buffer'],
   },
 });
