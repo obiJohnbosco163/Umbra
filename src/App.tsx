@@ -15,7 +15,12 @@ import {
   Wallet,
 } from 'lucide-react';
 import { useRegistry } from '@/near/useRegistry';
-import { formatYoctoNear, parseNearToYocto } from '@/near/registry';
+import {
+  formatYoctoNear,
+  isValidX25519PublicKey,
+  parseNearToYocto,
+} from '@/near/registry';
+import { createIdentity } from '@/crypto/umbraCrypto';
 import type { Subscription, Trader } from '@/types/market';
 
 const yellow = '#FFD000';
@@ -603,11 +608,41 @@ function Studio({ notify }: { notify: (message: string) => void }) {
   const { accountId, connect, traders, call } = useRegistry();
   const [handle, setHandle] = useState('');
   const [publicKey, setPublicKey] = useState('');
+  const [identityBackup, setIdentityBackup] = useState<{ url: string; filename: string } | null>(null);
   const [price, setPrice] = useState('0.1');
   const [period, setPeriod] = useState('2592000');
   const [maxFollowers, setMaxFollowers] = useState('100');
   const [busy, setBusy] = useState(false);
   const existing = traders.find((trader) => trader.accountId === accountId);
+
+  useEffect(
+    () => () => {
+      if (identityBackup) URL.revokeObjectURL(identityBackup.url);
+    },
+    [identityBackup],
+  );
+
+  const generateIdentity = () => {
+    const identity = createIdentity();
+    const identityFile = new Blob(
+      [
+        JSON.stringify(
+          {
+            algorithm: 'X25519',
+            publicKey: identity.publicKey,
+            secretKey: identity.secretKey,
+          },
+          null,
+          2,
+        ),
+      ],
+      { type: 'application/json' },
+    );
+    const filename = `umbra-x25519-identity-${Date.now()}.json`;
+    const url = URL.createObjectURL(identityFile);
+    setPublicKey(identity.publicKey);
+    setIdentityBackup({ url, filename });
+  };
 
   const register = async (event: FormEvent) => {
     event.preventDefault();
@@ -615,16 +650,39 @@ function Studio({ notify }: { notify: (message: string) => void }) {
       connect();
       return;
     }
-    setBusy(true);
     try {
+      const normalizedHandle = handle.trim();
+      if (!/^[a-z0-9_]{3,32}$/.test(normalizedHandle)) {
+        throw new Error('Handle must be 3–32 characters using lowercase letters, numbers, or underscores.');
+      }
+      if (!isValidX25519PublicKey(publicKey.trim())) {
+        throw new Error('Enter a valid Base64 X25519 public key that decodes to exactly 32 bytes.');
+      }
+      if (traders.some((trader) => trader.handle === normalizedHandle)) {
+        throw new Error('That handle is already registered. Choose a different handle.');
+      }
+      const priceYocto = parseNearToYocto(price);
+      if (BigInt(priceYocto) === 0n) {
+        throw new Error('Subscription price must be greater than zero.');
+      }
+      const periodSeconds = Number(period);
+      const followerLimit = Number(maxFollowers);
+      if (!Number.isInteger(periodSeconds) || periodSeconds < 1 || periodSeconds > 0xffff_ffff) {
+        throw new Error('Period must be a whole number between 1 and 4,294,967,295 seconds.');
+      }
+      if (!Number.isInteger(followerLimit) || followerLimit < 1 || followerLimit > 0xffff_ffff) {
+        throw new Error('Maximum followers must be a whole number between 1 and 4,294,967,295.');
+      }
+
+      setBusy(true);
       await call(
         'register_trader',
         {
-          handle: handle.trim(),
+          handle: normalizedHandle,
           enc_pub_key: publicKey.trim(),
-          price_per_period: parseNearToYocto(price),
-          period_seconds: Number(period),
-          max_followers: Number(maxFollowers),
+          price_per_period: priceYocto,
+          period_seconds: periodSeconds,
+          max_followers: followerLimit,
         },
         STORAGE_DEPOSIT_YOCTO,
       );
@@ -650,9 +708,29 @@ function Studio({ notify }: { notify: (message: string) => void }) {
             <label className="block text-sm">Public handle
               <input required minLength={3} maxLength={32} pattern="[a-z0-9_]+" value={handle} onChange={(event) => setHandle(event.target.value)} placeholder="your_handle" className="focus-ring mt-2 w-full rounded-lg border border-white/10 bg-transparent px-4 py-3 outline-none" />
             </label>
-            <label className="block text-sm">Base64 X25519 public key
-              <input required maxLength={64} value={publicKey} onChange={(event) => setPublicKey(event.target.value)} placeholder="32-byte public key, base64 encoded" className="focus-ring mt-2 w-full rounded-lg border border-white/10 bg-transparent px-4 py-3 font-mono text-xs outline-none" />
-            </label>
+            <div>
+              <label className="block text-sm" htmlFor="trader-public-key">Base64 X25519 public key</label>
+              <input id="trader-public-key" required maxLength={64} value={publicKey} onChange={(event) => {
+                setPublicKey(event.target.value);
+                setIdentityBackup(null);
+              }} placeholder="32-byte public key, base64 encoded" className="focus-ring mt-2 w-full rounded-lg border border-white/10 bg-transparent px-4 py-3 font-mono text-xs outline-none" />
+              <p className="mt-2 text-xs leading-relaxed text-[#F6F1E7]/45">
+                Use an X25519 encryption public key encoded as standard Base64 (44 characters, usually ending in =). This is not your NEAR wallet public key.
+              </p>
+              <button type="button" onClick={generateIdentity} className="focus-ring mt-3 rounded-lg border border-[#FFD000]/35 px-3 py-2 text-xs font-medium text-[#FFD000] transition hover:bg-[#FFD000]/10">
+                Generate X25519 keypair
+              </button>
+              {identityBackup && (
+                <p role="status" className="mt-3 rounded-lg border border-[#FFD000]/25 bg-[#FFD000]/[.06] p-3 text-xs leading-relaxed text-[#F6F1E7]/70">
+                  Keypair generated on this device. <a href={identityBackup.url} download={identityBackup.filename} className="font-semibold text-[#FFD000] underline">Download the private-key backup</a> and keep it somewhere secure; it cannot be recovered if lost. Only the public key above is sent to the contract.
+                </p>
+              )}
+              {publicKey && !isValidX25519PublicKey(publicKey.trim()) && (
+                <p role="alert" className="mt-2 text-xs text-[#FF5C6C]">
+                  This is not a valid 32-byte X25519 public key in standard Base64. Generate a keypair here or enter the public key from your encryption identity.
+                </p>
+              )}
+            </div>
             <label className="block text-sm">Subscription price (NEAR)
               <input required inputMode="decimal" value={price} onChange={(event) => setPrice(event.target.value)} className="focus-ring mt-2 w-full rounded-lg border border-white/10 bg-transparent px-4 py-3 outline-none" />
             </label>

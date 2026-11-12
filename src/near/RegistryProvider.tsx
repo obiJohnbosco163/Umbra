@@ -13,7 +13,11 @@ import {
 import { setupIntearWallet } from '@near-wallet-selector/intear-wallet';
 import { setupModal, type WalletSelectorModal } from '@near-wallet-selector/modal-ui';
 import { setupMyNearWallet } from '@near-wallet-selector/my-near-wallet';
-import { RegistryClient, isValidTestnetAccountId } from '@/near/registry';
+import {
+  getTransactionFailure,
+  RegistryClient,
+  isValidTestnetAccountId,
+} from '@/near/registry';
 import { RegistryContext, type RegistryContextValue } from '@/near/registry-context';
 import type { Trader } from '@/types/market';
 
@@ -138,12 +142,8 @@ export function RegistryProvider({ children }: { children: ReactNode }) {
       }
       const wallet = await selector.wallet();
       const outcome = await client.call(method, args, wallet, accountId, deposit);
-      if (outcome && typeof outcome === 'object' && 'status' in outcome) {
-        const status = outcome.status;
-        if (status && typeof status === 'object' && 'Failure' in status) {
-          throw new Error('The NEAR transaction failed. Check the wallet transaction details.');
-        }
-      }
+      const failure = getTransactionFailure(outcome);
+      if (failure) throw new Error(`NEAR transaction failed: ${failure}`);
       await refreshTraders();
     },
     [accountId, client, refreshTraders, selector],

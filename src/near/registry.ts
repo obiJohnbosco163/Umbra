@@ -66,6 +66,46 @@ export function parseNearToYocto(value: string): string {
   return (BigInt(whole) * YOCTO_PER_NEAR + BigInt(fraction.padEnd(24, '0'))).toString();
 }
 
+export function isValidX25519PublicKey(value: string): boolean {
+  if (!/^[A-Za-z0-9+/]{43}=$/.test(value)) return false;
+  try {
+    return atob(value).length === 32;
+  } catch {
+    return false;
+  }
+}
+
+export function getTransactionFailure(outcome: unknown): string | null {
+  if (!isRecord(outcome)) return null;
+
+  const statuses = [
+    outcome.status,
+    ...(Array.isArray(outcome.receipts_outcome)
+      ? outcome.receipts_outcome.map((receipt: unknown) =>
+          isRecord(receipt) && isRecord(receipt.outcome) ? receipt.outcome.status : null,
+        )
+      : []),
+  ];
+
+  for (const status of statuses) {
+    if (status === 'Failure') {
+      return 'NEAR reported that the transaction failed without an error message.';
+    }
+    if (!isRecord(status) || !('Failure' in status)) continue;
+    const failure = status.Failure;
+    if (isRecord(failure) && typeof failure.error_message === 'string') {
+      return failure.error_message;
+    }
+    return 'NEAR reported that the transaction failed without an error message.';
+  }
+
+  return null;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
 export function toTrader(record: TraderRecord, snapshots: PnlSnapshot[]): Trader {
   const latestForWindow = (days: number) =>
     [...snapshots].reverse().find((snapshot) => snapshot.window_days === days);
